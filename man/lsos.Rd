@@ -4,11 +4,16 @@
 \alias{lsos}
 \title{Improved list of objects}
 \usage{
-lsos(..., n = 10)
+lsos(
+  pos = 1,
+  pattern,
+  order.by = "Size_Mb",
+  decreasing = TRUE,
+  head = TRUE,
+  n = 10
+)
 }
 \arguments{
-\item{n}{numeric. Number of results to show when setting head to TRUE}
-
 \item{pos}{numeric. an alternative argument to name for specifying the environment as
 a position in the search list. Mostly there for back compatibility.}
 
@@ -19,9 +24,11 @@ a position in the search list. Mostly there for back compatibility.}
 \item{decreasing}{logical. Set to FALSE if increasing order is desired}
 
 \item{head}{logical. By default limits results to n results}
+
+\item{n}{numeric. Number of results to show when setting head to TRUE}
 }
 \value{
-
+data.frame
 }
 \description{
 Prints a table showing the size of biggest objects in the global environment
@@ -29,5 +36,5 @@ Prints a table showing the size of biggest objects in the global environment
 \href{https://stackoverflow.com/questions/1358003/tricks-to-manage-the-available-memory-in-an-r-session}{StackOverflow}
 }
 \author{
-Dirk Eddelbuettel https://stackoverflow.com/users/143305/dirk-eddelbuettel
+Dirk Eddelbuettel
 }

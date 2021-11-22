@@ -12,10 +12,9 @@
 #' @param head logical. By default limits results to n results
 #' @param n numeric. Number of results to show when setting head to TRUE
 #'
-#' @return
+#' @return data.frame
 #' @export
 #'
-#' @examples
 #' @author Dirk Eddelbuettel
 lsos <- function(pos = 1, pattern, order.by = "Size_Mb", decreasing = TRUE,
                          head = TRUE, n = 10){
@@ -25,7 +24,7 @@ lsos <- function(pos = 1, pattern, order.by = "Size_Mb", decreasing = TRUE,
     obj.class <- napply(names, function(x) as.character(class(x))[1])
     obj.mode <- napply(names, mode)
     obj.type <- ifelse(is.na(obj.class), obj.mode, obj.class)
-    obj.size <- napply(names, object.size) / 1024^2
+    obj.size <- signif(napply(names, utils::object.size) / 1024^2, 3)
     obj.dim <- t(napply(names, function(x)
         as.numeric(dim(x))[1:2]))
     vec <- is.na(obj.dim)[, 1] & (obj.type != "function")
