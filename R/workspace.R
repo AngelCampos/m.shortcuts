@@ -24,7 +24,7 @@ lsos <- function(pos = 1, pattern, order.by = "Size_Mb", decreasing = TRUE,
     obj.class <- napply(names, function(x) as.character(class(x))[1])
     obj.mode <- napply(names, mode)
     obj.type <- ifelse(is.na(obj.class), obj.mode, obj.class)
-    obj.size <- signif(napply(names, utils::object.size) / 1024^2, 3)
+    obj.size <- round(napply(names, utils::object.size) / 1024^2, digits = 2)
     obj.dim <- t(napply(names, function(x)
         as.numeric(dim(x))[1:2]))
     vec <- is.na(obj.dim)[, 1] & (obj.type != "function")
