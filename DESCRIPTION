@@ -1,0 +1,18 @@
+Package: m.shortcuts
+Title: Miguels shortcuts
+Version: 0.0.1
+Authors@R: 
+    person(given = "Miguel Angel",
+           family = "Garcia-Campos",
+           role = c("aut", "cre"),
+           email = "angel.campos@ciencias.unam.mx",
+           comment = c(ORCID = "0000-0001-5223-8174"))
+Description: R package with wrappers to recurrent functions I like and find 
+    recurrently useful but don't want to make an "official" package.
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Imports: 
+    ggplot2
