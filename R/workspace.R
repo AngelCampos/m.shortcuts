@@ -7,7 +7,7 @@
 #' @param pos numeric. an alternative argument to name for specifying the environment as
 #' a position in the search list. Mostly there for back compatibility.
 #' @param pattern character. pattern to match objects listed
-#' @param order.by character. Name of column to order results by
+#' @param order.by character. Name of column to order results by. Set to NULL for not ordering
 #' @param decreasing logical. Set to FALSE if increasing order is desired
 #' @param head logical. By default limits results to n results
 #' @param n numeric. Number of results to show when setting head to TRUE
@@ -31,8 +31,9 @@ lsos <- function(pos = 1, pattern, order.by = "Size_Mb", decreasing = TRUE,
     obj.dim[vec, 1] <- napply(names, length)[vec]
     out <- data.frame(obj.type, obj.size, obj.dim)
     names(out) <- c("Type", "Size_Mb", "Rows", "Columns")
-    if (!missing(order.by))
+    if(!is.null(order.by)){
         out <- out[order(out[[order.by]], decreasing=decreasing), ]
+    }
     if (head)
         out <- head(out, n)
     out
