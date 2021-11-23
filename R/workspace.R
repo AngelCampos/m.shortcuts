@@ -38,3 +38,19 @@ lsos <- function(pos = 1, pattern, order.by = "Size_Mb", decreasing = TRUE,
         out <- head(out, n)
     out
 }
+
+
+#' Remove tmp objects
+#'
+#' @param collectGarbage logical. Activate garbage collector
+#'
+#' @return matrix By default outputs the gc() output matrix
+#' @export
+#'
+#' @examples
+rmTmp <- function(collectGarbage = TRUE){
+    tmpOL <- grep(x = ls(pos = ".GlobalEnv"), pattern = "^tmp", value = TRUE)
+    rm(list = tmpOL, pos = ".GlobalEnv")
+    if(collectGarbage){gc()}
+}
+
