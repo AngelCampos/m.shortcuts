@@ -1,0 +1,2 @@
+# Pipe operator
+`%>%` <- magrittr::`%>%`
