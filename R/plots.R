@@ -42,6 +42,47 @@ multiplot <- function(..., plotlist = NULL, cols = 1, layout = NULL) {
     }
 }
 
+#' Interval heatmap
+#'
+#' Plots the mean value of a value Z when divided into groups defined by
+#' intervals at variables X and Y
+#'
+#' @param x numeric. X dimension
+#' @param y numeric. Y dimension
+#' @param z logical or numeric. Z dimension to be summarized
+#' @param x_n numeric. Number of groups for x dimension to be cut into
+#' @param y_n numeric. Number of groups for y dimension to be cut into
+#' @param nCores numeric. Number of cores to use to process data
+#' @param dig.lab numeric. Number of decimal positions to place in labels
+#' @param outputMatrix logical. Set to TRUE to output instead the matrix
+#' @param dispNum logical. Set to FALSE for not showing the numeric labels at
+#' each cell
+#' @param na.rm logical. Indicating if NA values should be removed to calculate
+#' mean Z
+#'
+#' @return matrix or
+#' @export
+#'
+#' @examples
+#' intervalHeatmap(x = iris$Sepal.Length, y = iris$Sepal.Width,
+#'                 z = as.numeric(iris$Species), x_n = 5, y_n = 5)
+intervalHeatmap <- function(x, y, z, x_n, y_n, nCores = 1, dig.lab = 1,
+                                    outputMatrix = FALSE, dispNum = TRUE, na.rm = FALSE){
+    tmpX_fct <- ggplot2::cut_interval(x, x_n, dig.lab = dig.lab)
+    tmpY_fct <- ggplot2::cut_interval(y, y_n, dig.lab = dig.lab)
+    tmpO <- parallel::mclapply(mc.cores = nCores, rev(levels(tmpY_fct)), function(yF){
+        unlist(lapply(levels(tmpX_fct), function(xF){
+            mean(z[which(tmpX_fct == xF & tmpY_fct == yF)], na.rm = na.rm)
+        }))
+    }) %>%
+        do.call(what = "rbind") %>%
+        magrittr::set_rownames(rev(levels(tmpY_fct))) %>%
+        magrittr::set_colnames(levels(tmpX_fct))
+    if(outputMatrix){return(tmpO)}
+    pheatmap::pheatmap(tmpO, cluster_cols = FALSE, cluster_rows = FALSE,
+                       display_numbers = dispNum, number_format = "%.2f")
+}
+
 # # ggBoxplot shortcut
 # ggBoxplot <- function(xFactor, yNumeric, outLCol = NA){
 #     tmpDF <- data.frame(xFactor, yNumeric)

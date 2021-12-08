@@ -19,7 +19,7 @@ a position in the search list. Mostly there for back compatibility.}
 
 \item{pattern}{character. pattern to match objects listed}
 
-\item{order.by}{character. Name of column to order results by}
+\item{order.by}{character. Name of column to order results by. Set to NULL for not ordering}
 
 \item{decreasing}{logical. Set to FALSE if increasing order is desired}
 
