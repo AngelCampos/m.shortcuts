@@ -58,21 +58,24 @@ multiplot <- function(..., plotlist = NULL, cols = 1, layout = NULL) {
 #' @param dispNum logical. Set to FALSE for not showing the numeric labels at
 #' each cell
 #' @param na.rm logical. Indicating if NA values should be removed to calculate
-#' mean Z
+#' mean Z. Default: TRUE.
+#' @param FUN character. Name of function to be used over the values that fall
+#' inside the combinations of x and y intervals. e.g. "mean" or "sum".
 #'
-#' @return matrix or
+#' @return matrix / pheatmap
 #' @export
 #'
 #' @examples
 #' intervalHeatmap(x = iris$Sepal.Length, y = iris$Sepal.Width,
-#'                 z = as.numeric(iris$Species), x_n = 5, y_n = 5)
+#'                 z = rep(1, nrow(iris)), x_n = 5, y_n = 5, FUN = "sum")
 intervalHeatmap <- function(x, y, z, x_n, y_n, nCores = 1, dig.lab = 1,
-                                    outputMatrix = FALSE, dispNum = TRUE, na.rm = FALSE){
+                            outputMatrix = FALSE, dispNum = TRUE, na.rm = TRUE, FUN = "mean"){
     tmpX_fct <- ggplot2::cut_interval(x, x_n, dig.lab = dig.lab)
     tmpY_fct <- ggplot2::cut_interval(y, y_n, dig.lab = dig.lab)
     tmpO <- parallel::mclapply(mc.cores = nCores, rev(levels(tmpY_fct)), function(yF){
         unlist(lapply(levels(tmpX_fct), function(xF){
-            mean(z[which(tmpX_fct == xF & tmpY_fct == yF)], na.rm = na.rm)
+            FUN <- get(FUN)
+            FUN(z[which(tmpX_fct == xF & tmpY_fct == yF)], na.rm = na.rm)
         }))
     }) %>%
         do.call(what = "rbind") %>%
@@ -83,15 +86,29 @@ intervalHeatmap <- function(x, y, z, x_n, y_n, nCores = 1, dig.lab = 1,
                        display_numbers = dispNum, number_format = "%.2f")
 }
 
-# # ggBoxplot shortcut
-# ggBoxplot <- function(xFactor, yNumeric, outLCol = NA){
-#     tmpDF <- data.frame(xFactor, yNumeric)
-#     ggplot(data = tmpDF, aes(x = xFactor, y = yNumeric)) +
-#         geom_boxplot(outlier.colour= outLCol, outlier.size = 1) +
-#         theme_minimal() + stat_n_text(size = 3, angle = 90) +
-#         theme(axis.text.x = element_text(angle = 90, hjust = 1))
-# }
-#
+#' ggBoxplot
+#'
+#' ggplot2 boxplot shortcut
+#'
+#' @param xFactor factor. Factor vector specifying the groups
+#' @param yNumeric numeric. Numeric vector specifying the values per observation
+#' @param outLCol character. Color of outliers. NA for hidding outliers.
+#' @param outLAlpha numeric. Value from 0 to 1 to set transparency of outliers.
+#'
+#' @return ggplot
+#' @export
+#'
+#' @examples
+#' ggBoxplot(iris$Species, iris$Petal.Length)
+ggBoxplot <- function(xFactor, yNumeric, outLCol = NA, outLAlpha = 0.5){
+    if(length(xFactor) != length(yNumeric)){stop("Length of vectors is not the same.")}
+    ggplot2::ggplot(data = data.frame(x = xFactor, y = yNumeric),
+                    ggplot2::aes(x = .data$x, y = .data$y)) +
+        ggplot2::geom_boxplot(outlier.colour = outLCol, outlier.size = 1, outlier.alpha = outLAlpha) +
+        ggplot2::theme_minimal() + EnvStats::stat_n_text(size = 3, angle = 90) +
+        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))
+}
+
 # # Boxplot shortcut function for matrices
 # ggBoxplot_matrix <- function(matrix, title = "Title", xlab = "x", ylab = "y", outLCol = NA){
 #     ggplot(data= reshape2::melt(as.data.frame(matrix)), aes(variable, value)) +

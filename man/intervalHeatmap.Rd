@@ -14,7 +14,8 @@ intervalHeatmap(
   dig.lab = 1,
   outputMatrix = FALSE,
   dispNum = TRUE,
-  na.rm = FALSE
+  na.rm = TRUE,
+  FUN = "mean"
 )
 }
 \arguments{
@@ -38,10 +39,13 @@ intervalHeatmap(
 each cell}
 
 \item{na.rm}{logical. Indicating if NA values should be removed to calculate
-mean Z}
+mean Z. Default: TRUE.}
+
+\item{FUN}{character. Name of function to be used over the values that fall
+inside the combinations of x and y intervals. e.g. "mean" or "sum".}
 }
 \value{
-matrix or
+matrix / pheatmap
 }
 \description{
 Plots the mean value of a value Z when divided into groups defined by
@@ -49,5 +53,5 @@ intervals at variables X and Y
 }
 \examples{
 intervalHeatmap(x = iris$Sepal.Length, y = iris$Sepal.Width,
-z = as.numeric(iris$Species), x_n = 5, y_n = 5)
+                z = rep(1, nrow(iris)), x_n = 5, y_n = 5, FUN = "sum")
 }

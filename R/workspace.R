@@ -1,3 +1,17 @@
+#' m.shortcuts: A personal package to make my life easier
+#'
+#' The m.shortcuts package has a disparage collection of functions used in
+#' common bioinformatics pipelines, and work from
+#' [Miguel Angel Garcia-Campos](https://angelcampos.github.io/).
+#'
+#' @docType package
+#' @name m.shortcuts
+#' @aliases m.shortcuts-package
+#' @keywords ggplot2
+#' @importFrom rlang .data
+"_PACKAGE"
+NULL
+
 #' Improved list of objects
 #'
 #' Prints a table showing the size of biggest objects in the global environment
@@ -46,11 +60,88 @@ lsos <- function(pos = 1, pattern, order.by = "Size_Mb", decreasing = TRUE,
 #'
 #' @return matrix By default outputs the gc() output matrix
 #' @export
-#'
-#' @examples
 rmTmp <- function(collectGarbage = TRUE){
     tmpOL <- grep(x = ls(pos = ".GlobalEnv"), pattern = "^tmp", value = TRUE)
     rm(list = tmpOL, pos = ".GlobalEnv")
     if(collectGarbage){gc()}
 }
 
+#' Check figs
+#'
+#' Look for matches figures in both .R scripts and .Rmd notebooks
+#'
+#' @param figsDir Figures directory. Use empty
+#' @param scripts character. File names of scripts to check
+#' @param notebooks character. File names of Notebooks to check
+#' @param fig_exts character. Extensions associated to figures, e.g. 'pdf',
+#'  'jpg'. Do not include a "." before the extension.
+#'
+#' @return data.table
+#' @export
+check_figs <-  function(figsDir = "figs",
+                        scripts = list.files(pattern = "\\.R$"),
+                        notebooks = list.files(pattern = "\\.Rmd$"),
+                        fig_exts = c("pdf", "png", "jpg")){
+    if(!dir.exists(figsDir)){stop("Directory '", figsDir, "' does not exist")}
+    figsInDir <- lapply(fig_exts, function(ext){
+        tmp <- list.files(figsDir, ext, full.names = TRUE, recursive = TRUE)
+        data.table::data.table(fig = tmp)
+    }) %>% do.call(what = "rbind")
+    figsScrpt <- lapply(scripts, function(file){
+        script <- readLines(file)
+        figFiles <- lapply(fig_exts, function(figExt){
+            stringr::str_extract_all(script, pattern = file.path(figsDir, paste0("[[:graph:]]+\\.", figExt))) %>% unlist()
+        }) %>% unlist() %>% unique()
+        lapply(figFiles, function(figFile){
+            data.table::data.table(fig = figFile, generated_by = file, generated_line = which(stringr::str_detect(script, figFile)))
+        }) %>% do.call(what = "rbind")
+    }) %>% do.call(what = "rbind")
+    if(nrow(figsInDir) > 0){
+        figsTable <- dplyr::full_join(figsScrpt, figsInDir, by = "fig")
+    }else{
+        figsTable <- figsScrpt
+    }
+
+    figs_dupGen <- figsTable[duplicated(dplyr::select(figsTable, c("fig", "generated_by"))),]$fig
+
+    figsNoteB <- lapply(notebooks, function(file){
+        notebook <- readLines(file)
+        figFiles <- lapply(fig_exts, function(figExt){
+            stringr::str_extract_all(notebook, pattern = file.path(figsDir, paste0("[[:graph:]]+\\.", figExt))) %>% unlist()
+        }) %>% unlist() %>% unique()
+        lapply(figFiles, function(figFile){
+            if(any(stringr::str_detect(notebook, figFile))){
+                data.frame(fig = figFile, used_in = file, used_line = stringr::str_which(notebook, figFile))
+            }else{
+                NULL
+            }
+        }) %>% do.call(what = "rbind")
+    }) %>% do.call(what = "rbind")
+
+    if(is.null(figsNoteB)){
+        figsTable$used_in <- NA
+        figsTable$used_line <- NA
+    }else{
+        figsTable <- dplyr::full_join(figsTable, figsNoteB, by = "fig")
+    }
+    figs_notUsed <- figsTable[is.na(figsTable$used_in),]$fig
+    tmpT <- unique(dplyr::select(figsTable, c("fig", "used_in", "used_line")))
+    figs_dupUsed <- tmpT[duplicated(dplyr::select(tmpT, c("fig", "used_in"))),]$fig
+    if(length(figs_notUsed) > 0){
+        warning("Found figures in dir, but not in code:\n",
+                paste(figs_notUsed, collapse = "\n"))
+    }
+    if(length(figs_dupGen) > 0){
+        warning("Found duplicated figure name(s) in scripts:\n",
+                paste0(paste(names(figsTable), collapse = "\t"), "\n"),
+                apply(figsTable[figsTable$fig %in% figs_dupGen,][order(figsTable$fig),], 1, "paste", collapse = "\t") %>% paste(collapse = "\n"))
+    }
+    if(length(figs_dupUsed) > 0){
+        warning("Found plots used more than once in the same notebook::\n",
+                "Fig\tgenerated_by\tused_in\tline\n",
+                apply(figsTable[figsTable$fig %in% figs_dupUsed,][order(figsTable$fig),], 1, "paste", collapse = "\t") %>% paste(collapse = "\n"))
+
+    }
+    figsTable$fig_exists <- file.exists(figsTable$fig)
+    figsTable[order(figsTable$generated_by),]
+}
