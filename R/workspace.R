@@ -133,13 +133,11 @@ check_figs <-  function(figsDir = "figs",
     }
     if(length(figs_dupGen) > 0){
         warning("Found duplicated figure name(s) in scripts:\n",
-                paste0(paste(names(figsTable), collapse = "\t"), "\n"),
-                apply(figsTable[figsTable$fig %in% figs_dupGen,][order(figsTable$fig),], 1, "paste", collapse = "\t") %>% paste(collapse = "\n"))
+                paste(figs_dupGen, collapse = "\n"))
     }
     if(length(figs_dupUsed) > 0){
         warning("Found plots used more than once in the same notebook::\n",
-                "Fig\tgenerated_by\tused_in\tline\n",
-                apply(figsTable[figsTable$fig %in% figs_dupUsed,][order(figsTable$fig),], 1, "paste", collapse = "\t") %>% paste(collapse = "\n"))
+                paste(figs_dupUsed, collapse = "\n"))
 
     }
     figsTable$fig_exists <- file.exists(figsTable$fig)
