@@ -2,7 +2,7 @@
 % Please edit documentation in R/workspace.R
 \name{rmTmp}
 \alias{rmTmp}
-\title{Remove tmp objects}
+\title{Remove tmp objects from global environment}
 \usage{
 rmTmp(collectGarbage = TRUE)
 }
@@ -13,5 +13,5 @@ rmTmp(collectGarbage = TRUE)
 matrix By default outputs the gc() output matrix
 }
 \description{
-Remove tmp objects
+Remove tmp objects from global environment
 }

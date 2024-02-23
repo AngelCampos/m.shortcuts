@@ -54,7 +54,7 @@ lsos <- function(pos = 1, pattern, order.by = "Size_Mb", decreasing = TRUE,
 }
 
 
-#' Remove tmp objects
+#' Remove tmp objects from global environment
 #'
 #' @param collectGarbage logical. Activate garbage collector
 #'

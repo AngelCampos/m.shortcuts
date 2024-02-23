@@ -1,19 +1,19 @@
 Package: m.shortcuts
 Title: Miguels shortcuts
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: 
     person(given = "Miguel Angel",
            family = "Garcia-Campos",
            role = c("aut", "cre"),
            email = "angel.campos@weizmann.ac.il",
            comment = c(ORCID = "0000-0001-5223-8174"))
-Description: R package with disparage collection of functions used in 
-    common bioinformatics pipelines, and work from Miguel Garcia-Campos.
+Description: A collection of assorted functions used in common bioinformatics 
+    pipelines, and work from Miguel Garcia-Campos.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
 Imports: 
     data.table,
     dplyr,

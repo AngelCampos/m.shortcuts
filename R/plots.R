@@ -109,6 +109,21 @@ ggBoxplot <- function(xFactor, yNumeric, outLCol = NA, outLAlpha = 0.5){
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))
 }
 
+
+#' Angle ggplot x labels
+#'
+#' @param angle Angle used to tilt x labels (default = 90)
+#'
+#' @return ggplot
+#' @export
+#'
+#' @example
+#' ggBoxplot(iris$Species, iris$Petal.Length) + ggAngleXLabs(45)
+ggAngleXLabs <- function(angle = 90){
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = angle, vjust = 0.5, hjust=1))
+}
+
+
 # # Boxplot shortcut function for matrices
 # ggBoxplot_matrix <- function(matrix, title = "Title", xlab = "x", ylab = "y", outLCol = NA){
 #     ggplot(data= reshape2::melt(as.data.frame(matrix)), aes(variable, value)) +
