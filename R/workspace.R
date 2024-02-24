@@ -143,3 +143,21 @@ check_figs <-  function(figsDir = "figs",
     figsTable$fig_exists <- file.exists(figsTable$fig)
     figsTable[order(figsTable$generated_by),]
 }
+
+check_Rmds <- function(path = ".", recursive = TRUE, full.names = TRUE){
+    DT_Rmd <- data.table(
+        RmdFiles = list.files(path = path, pattern = "*.Rmd",
+                              recursive = recursive, full.names = TRUE) %>% 
+            sort())
+    DT_Rmd$html <- gsub(".Rmd$", ".html", DT_Rmd$RmdFiles)
+    DT_Rmd$html_exists <- file.exists(DT_Rmd$html)
+    DT_Rmd
+}
+
+get_GSEtable <- function(GSE){
+    require(GEOfastq)
+    require(magrittr)
+    crawl_gse(GSE) %>% 
+        extract_gsms() %>% 
+        crawl_gsms()
+}
